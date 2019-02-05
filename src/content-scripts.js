@@ -27,8 +27,17 @@ const addControl = () => {
   }
   input.addEventListener('keydown', (e) => {
     e.stopPropagation()
-    if (e.keyCode === 27) {
-      e.target.blur()
+    switch (e.keyCode) {
+      case 13: {
+        const sendButton = messageButtons.querySelector(
+          '#send-button button#button'
+        )
+        sendButton && sendButton.click()
+        break
+      }
+      case 17:
+        e.target.blur()
+        break
     }
   })
   input.addEventListener('focus', () => {
