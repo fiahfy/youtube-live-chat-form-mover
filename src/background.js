@@ -15,7 +15,7 @@ const code = `
 .html5-video-player.ytp-fullscreen
 .${className.controls} #top #input-container
 yt-live-chat-text-input-field-renderer#input #input {
-  line-height: 38px;
+  line-height: 36px;
 }
 .html5-video-player.ytp-fullscreen
 .${className.controls} #message-buttons #send-button #button {
@@ -83,7 +83,7 @@ yt-live-chat-text-input-field-renderer#input[has-text] #label {
 .${className.controls} #top #input-container
 yt-live-chat-text-input-field-renderer#input #label {
   position: absolute;
-  top: 1px;
+  top: 0;
   left: 1px;
   padding-left: 8px;
   pointer-events: none;
@@ -93,7 +93,7 @@ yt-live-chat-text-input-field-renderer#input #input {
   flex: 1;
   min-width: 0;
   height: 66%;
-  line-height: 26px;
+  line-height: 24px;
   border: 1px solid #eee;
   border-radius: 4px;
   padding: 0 8px;
@@ -153,19 +153,23 @@ a.yt-button-renderer:hover {
 }
 `
 
-const contentLoaded = (tabId) => {
-  // TODO: clear css inserted before
+const contentLoaded = (tabId, injected) => {
+  if (injected) {
+    return
+  }
+  logger.log('insert')
   chrome.tabs.insertCSS(tabId, { code })
+  chrome.tabs.sendMessage(tabId, { id: 'cssInjected' })
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   logger.log('chrome.runtime.onMessage', message, sender, sendResponse)
 
-  const { id } = message
+  const { id, data } = message
   const { tab } = sender
   switch (id) {
     case 'contentLoaded':
-      contentLoaded(tab.id)
+      contentLoaded(tab.id, data.injected)
       break
   }
 })
