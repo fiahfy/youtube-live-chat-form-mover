@@ -12,20 +12,32 @@ const addControl = () => {
     return
   }
 
-  const top = document.querySelector('div#top')
-  const buttons = document.querySelector('div#message-buttons')
+  const top = document.querySelector('#action-panel #container #top')
+  const buttons = document.querySelector(
+    '#action-panel #container #buttons.yt-live-chat-message-input-renderer'
+  )
   if (!top || !buttons) {
     return
   }
 
   const input = top.querySelector('div#input')
-  if (!input) {
+  const messageButtons = buttons.querySelector('#message-buttons')
+  if (!input || !messageButtons) {
     return
   }
   input.addEventListener('keydown', (e) => {
     e.stopPropagation()
-    if (e.keyCode === 27) {
-      e.target.blur()
+    switch (e.keyCode) {
+      case 13: {
+        const sendButton = messageButtons.querySelector(
+          '#send-button button#button'
+        )
+        sendButton && sendButton.click()
+        break
+      }
+      case 17:
+        e.target.blur()
+        break
     }
   })
   input.addEventListener('focus', () => {
@@ -35,19 +47,59 @@ const addControl = () => {
     parent.document.body.classList.remove(className.focused)
   })
 
-  // TODO: put description "Chat Form is Moved to Bottom Controls"
+  // add description
+  const description = document.createElement('button')
+  description.textContent = 'Chat Form is Moved to Bottom Controls'
+  description.style.textAlign = 'center'
+  description.style.fontSize = 'smaller'
+  description.style.flex = 1
+  description.style.color = 'var(--yt-spec-text-secondary)'
+  description.style.webkitAppearance = 'none'
+  description.style.background = 'none'
+  description.style.border = 'none'
+  description.style.outline = 'none'
+  description.style.cursor = 'pointer'
+  description.addEventListener('click', () => {
+    input.focus()
+  })
+  const wrapper = document.createElement('div')
+  wrapper.style.flex = 1
+  wrapper.style.display = 'flex'
+  wrapper.style.alignItems = 'center'
+  wrapper.append(description)
+  buttons.append(wrapper)
 
+  // add controls
   const controls = document.createElement('div')
   controls.classList.add(className.controls)
   controls.style.opacity = 0
   controls.style.transition = 'opacity 1s'
-  // TODO: adjust size if controls size changed
   controls.style.left = `${leftControls.offsetWidth}px`
   controls.style.right = `${rightControls.offsetWidth}px`
   controls.append(top)
-  controls.append(buttons)
-
+  controls.append(messageButtons)
   rightControls.parentNode.insertBefore(controls, rightControls)
+
+  // setup resize observers
+  const leftControlsObserver = new ResizeObserver((entries) => {
+    const [entry] = entries
+    controls.style.left = `${entry.contentRect.width}px`
+  })
+  leftControlsObserver.observe(leftControls)
+  const rightControlsObserver = new ResizeObserver((entries) => {
+    const [entry] = entries
+    controls.style.right = `${entry.contentRect.width}px`
+  })
+  rightControlsObserver.observe(rightControls)
+  const controlsObserver = new ResizeObserver((entries) => {
+    const [entry] = entries
+    if (entry.contentRect.width < 512) {
+      controls.classList.add(className.smallControls)
+    } else {
+      controls.classList.remove(className.smallControls)
+    }
+  })
+  controlsObserver.observe(controls)
 
   // fade in...
   setTimeout(() => {
@@ -60,8 +112,20 @@ const removeControl = () => {
   button && button.remove()
 }
 
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  logger.log('chrome.runtime.onMessage', message, sender, sendResponse)
+
+  const { id } = message
+  switch (id) {
+    case 'cssInjected':
+      parent.document.body.classList.add(className.injected)
+      break
+  }
+})
+
 document.addEventListener('DOMContentLoaded', () => {
-  chrome.runtime.sendMessage({ id: 'contentLoaded' })
+  const injected = parent.document.body.classList.contains(className.injected)
+  chrome.runtime.sendMessage({ id: 'contentLoaded', data: { injected } })
 
   addControl()
 
