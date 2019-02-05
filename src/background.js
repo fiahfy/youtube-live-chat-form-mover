@@ -12,6 +12,17 @@ const code = `
   display: block!important;
   opacity: 1!important;
 }
+
+.html5-video-player.ytp-fullscreen
+.${className.controls} #top yt-img-shadow#avatar img {
+  width: 36px;
+  height: 36px;
+}
+.html5-video-player.ytp-fullscreen
+.${className.controls} #top #input-container
+yt-live-chat-author-chip {
+  display: none;
+}
 .html5-video-player.ytp-fullscreen
 .${className.controls} #top #input-container
 yt-live-chat-text-input-field-renderer#input #input {
@@ -22,12 +33,19 @@ yt-live-chat-text-input-field-renderer#input #input {
   width: 36px;
   height: 36px;
 }
+
 .ytp-chrome-bottom .ytp-chrome-controls {
   position: relative;
 }
 .ytp-chrome-bottom .ytp-chrome-controls .ytp-right-controls .ytp-fullerscreen-edu-button {
   display: none;
 }
+
+.${className.smallControls}.${className.controls}
+#top #input-container yt-live-chat-author-chip {
+  display: none;
+}
+
 .${className.controls} {
   position: absolute;
   top: 0;
@@ -43,12 +61,12 @@ yt-live-chat-text-input-field-renderer#input #input {
   flex: 1;
   min-width: 0;
   align-items: center;
-  width: 100%;
   height: 100%;
 }
 .${className.controls} #top yt-img-shadow#avatar {
   border-radius: 50%;
   margin-right: 8px;
+  margin-bottom: 1px;
   overflow: hidden;
 }
 .${className.controls} #top #input-container {
@@ -62,9 +80,10 @@ yt-live-chat-text-input-field-renderer#input #input {
 yt-live-chat-author-chip {
   display: flex;
   margin-right: 8px;
-  max-width: 64px;
+  max-width: 128px;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .${className.controls} #top #input-container
 yt-live-chat-text-input-field-renderer#input {

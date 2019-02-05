@@ -91,6 +91,15 @@ const addControl = () => {
     controls.style.right = `${entry.contentRect.width}px`
   })
   rightControlsObserver.observe(rightControls)
+  const controlsObserver = new ResizeObserver((entries) => {
+    const [entry] = entries
+    if (entry.contentRect.width < 512) {
+      controls.classList.add(className.smallControls)
+    } else {
+      controls.classList.remove(className.smallControls)
+    }
+  })
+  controlsObserver.observe(controls)
 
   // fade in...
   setTimeout(() => {
